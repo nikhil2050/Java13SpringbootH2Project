@@ -17,14 +17,15 @@ import org.springframework.web.bind.annotation.RestController;
 import com.directory.exception.ResourceNotFoundException;
 import com.directory.model.Person;
 import com.directory.repository.PersonRepository;
+import com.directory.service.PersonService;
 
 @RestController
 @RequestMapping("/api/People")
 public class PersonController {
-	
-//	@Autowired
-//	private PersonService personService;
-	
+
+	@Autowired
+	private PersonService personService;
+
 	@Autowired
 	private PersonRepository personRepository;
 	
@@ -48,14 +49,7 @@ public class PersonController {
 	@PatchMapping("/{personId}")
 	public ResponseEntity<Person> updatePerson(@PathVariable(value = "personId") Long personId,
 			@Valid @RequestBody Person updatedPersonJson) throws ResourceNotFoundException {
-		Person person = personRepository.findById(personId)
-				.orElseThrow(() -> new ResourceNotFoundException("Person not found for this id :: " + personId));
-
-		person.setEmail(updatedPersonJson.getEmail());
-		person.setAvatar(updatedPersonJson.getAvatar());
-		person.setName(updatedPersonJson.getName());
-		final Person updatedPerson = personRepository.save(person);
-		return ResponseEntity.ok(updatedPerson);
+		return personService.updatePerson(personId, updatedPersonJson);
 	}
 
 	/**
@@ -76,9 +70,7 @@ public class PersonController {
 	@GetMapping("/{personId}")
 	public ResponseEntity<Person> getPersonById(@PathVariable(value = "personId") Long personId)
 			throws ResourceNotFoundException {
-		Person person = personRepository.findById(personId)
-				.orElseThrow(() -> new ResourceNotFoundException("Person not found for this id :: " + personId));
-		return ResponseEntity.ok().body(person);
+		return personService.getPersonById(personId);
 	}
 	
 }
